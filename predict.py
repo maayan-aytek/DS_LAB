@@ -97,9 +97,10 @@ def pre_process(df):
 
         # Add the selected row to the results DataFrame
         results.loc[name] = row
-    to_model_df = results.drop('patient id', axis=1)
-    to_model_df = to_model_df.apply(pd.to_numeric)
-    X = to_model_df.drop('SepsisLabel', axis=1)
+    ids = results["patient id"]
+    to_model_df = results.apply(pd.to_numeric, errors='coerce')
+    to_model_df["patient id"] = ids
+    X = to_model_df.drop(['SepsisLabel','patient id'], axis=1)
     y = to_model_df["SepsisLabel"]
 
     return X, y, to_model_df
@@ -112,7 +113,7 @@ def predict(X_test, y_test, test_df):
     print(f1)
     test_df["prediction"] = y_pred
     test_df = test_df.rename(columns={"patient id": "id"})
-    output = test_df[['id','prediction']]
+    output = test_df[["id","prediction"]]
     output.to_csv("output.csv", index=False)
 
 
