@@ -109,12 +109,10 @@ def pre_process(df):
 def predict(X_test, y_test, test_df):
     model = pickle.load(open("model.pkl", "rb"))
     y_pred = model.predict(X_test)
-    f1 = f1_score(y_test, y_pred)
-    print(f1)
     test_df["prediction"] = y_pred
     test_df = test_df.rename(columns={"patient id": "id"})
     output = test_df[["id","prediction"]]
-    output.to_csv("output.csv", index=False)
+    output.to_csv("prediction.csv", index=False)
 
 
 if __name__ == '__main__':
