@@ -118,7 +118,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='File path prediction')
     parser.add_argument('filepath', type=str, help='Path to the file for prediction')
     args = parser.parse_args()
-    train_df = concat_all_patients(args.filename)
+    train_df = concat_all_patients(args.filepath)
     X_train, y_train, train_df = pre_process(train_df, type_df="train")
     model = XGBClassifier(n_estimators=200, max_depth=50, eta=0.05, gamma=0.1, reg_lambda=0.8, min_child_weight=2)
     model.fit(X_train, y_train)
