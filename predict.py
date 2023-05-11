@@ -3,7 +3,6 @@ import os
 import pickle
 import pandas as pd
 import numpy as np
-from sklearn.metrics import f1_score
 
 
 def concat_all_patients(file_path):
@@ -108,7 +107,6 @@ def pre_process(df):
 def predict(X_test, y_test, test_df):
     model = pickle.load(open("model.pkl", "rb"))
     y_pred = model.predict(X_test)
-    print(f1_score(y_test, y_pred))
     test_df["prediction"] = y_pred
     test_df = test_df.rename(columns={"patient id": "id"})
     output = test_df[["id","prediction"]]
