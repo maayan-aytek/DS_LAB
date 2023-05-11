@@ -1,7 +1,6 @@
 from xgboost import XGBClassifier
 import argparse
 import os
-from tqdm import tqdm
 import pickle
 import pandas as pd
 import numpy as np
@@ -9,7 +8,7 @@ import numpy as np
 def concat_all_patients(file_path):
     directory = os.listdir(file_path)
     all_df = pd.DataFrame()
-    for filename in tqdm(directory):
+    for filename in directory:
         with open(os.path.join(file_path, filename), 'r') as f:
             df = pd.read_csv(f, sep='|')
             # index = df.index[df['SepsisLabel'] == 1].min()

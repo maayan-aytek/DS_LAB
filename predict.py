@@ -1,6 +1,5 @@
 import argparse
 import os
-from tqdm import tqdm
 import pickle
 import pandas as pd
 import numpy as np
@@ -10,7 +9,7 @@ from sklearn.metrics import f1_score
 def concat_all_patients(file_path):
     directory = os.listdir(file_path)
     all_df = pd.DataFrame()
-    for filename in tqdm(directory):
+    for filename in directory:
         with open(os.path.join(file_path, filename), 'r') as f:
             df = pd.read_csv(f, sep='|')
             df['patient id'] = filename[:-4]
@@ -109,6 +108,7 @@ def pre_process(df):
 def predict(X_test, y_test, test_df):
     model = pickle.load(open("model.pkl", "rb"))
     y_pred = model.predict(X_test)
+    print(f1_score(y_test, y_pred))
     test_df["prediction"] = y_pred
     test_df = test_df.rename(columns={"patient id": "id"})
     output = test_df[["id","prediction"]]
