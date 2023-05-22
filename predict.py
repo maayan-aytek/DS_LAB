@@ -30,23 +30,29 @@ def outliers_perc_of_col(target, df):
 
 
 def pre_process(df):
+    avg_dict = {'HR': 84.51555463407765, 'O2Sat': 97.14622407039397, 'Temp': 36.86225627343898, 'SBP': 123.54822621152614, 'MAP': 82.65786949525612, 'DBP': 63.72853564554743, 'Resp': 18.678977055200004, 'EtCO2': 33.062411655478535, 'BaseExcess': 0.00883608211932965, 'HCO3': 24.365009506000906, 'FiO2': 0.5097275467997768, 'pH': 7.391309780879508, 'PaCO2': 40.39648897356055, 'SaO2': 95.66168781719271, 'AST': 82.02189444557456, 'BUN': 22.50209223298439, 'Alkalinephos': 81.38623051204615, 'Calcium': 8.183274536957347, 'Chloride': 105.61275108099791, 'Creatinine': 1.4145731949030103, 'Bilirubin_direct': 0.5523103363742105, 'Glucose': 130.67136929444348, 'Lactate': 1.8869094674031528, 'Magnesium': 2.036425339425519, 'Phosphate': 3.4337188544812514, 'Potassium': 4.072790630656006, 'Bilirubin_total': 1.1490866284861856, 'TroponinI': 1.4645463199127902, 'Hct': 31.479664069142153, 'Hgb': 10.514291170502974, 'PTT': 34.909836989688145, 'WBC': 11.032792273668512, 'Fibrinogen': 262.5899049921501, 'Platelets': 201.84890309355782, 'Age': 62.03636171833029, 'Gender': 0.5554242884191091, 'Unit1': 0.6919664512494719, 'Unit2': 0.30803354875052813, 'HospAdmTime': -55.049495190928475, 'ICULOS': 26.57108506632033, 'SepsisLabel': 0.017580233777207504, 'patient id': 10052.137260654805}
+    all_null_list = []
     patients_size = df.groupby("patient id").size()
     patients_size = patients_size[patients_size >= 36]
     full_hours_df = df[df['patient id'].isin(patients_size.index)].reset_index(drop=True)
-
     # backward and forward fill
     df_processed = df.groupby('patient id').apply(lambda x: x.bfill().ffill()).reset_index(drop=True)
     outlier_perc_dict = {}
     # Filling the rest of null values based on median/mean/mode according to the feature's outliers
     for col in df_processed.columns:
         if col != "patient id":
+            if df_processed[col].isnull().all():
+                df_processed[col] = avg_dict[col]
+                full_hours_df[col] = avg_dict[col]
+                all_null_list.append(col)
+                continue
             outlier_perc_dict[col] = [outliers_perc_of_col(col, df_processed)]
     outliers_perc_df = pd.DataFrame(outlier_perc_dict).T
     outliers_perc_df.columns = ["Outliers %"]
     outliers_perc_df = outliers_perc_df.sort_values(by=['Outliers %'], ascending=False)
     columns = df_processed.columns
     for col in columns:
-        if col != "patient id":
+        if col != "patient id" and col not in all_null_list:
             median = full_hours_df[col].median()
             df_processed[col] = df_processed[col].fillna(median)
             avg = full_hours_df[col].mean()
